@@ -1,15 +1,26 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, {useState}from 'react';
 import { Link,useParams } from 'react-router-dom';
+import Book from '../components/ui/Book';
 import Price from '../components/ui/Price';
 import Rating from '../components/ui/Rating';
+import Cart from './Cart';
 
 
 
-const BookInfo = ({books}) => {
+const BookInfo = ({books, addToCart}) => {
    const {id} = useParams()
-   const book = books.find(book => book.id === id )
-   console.log(book)
+   const book = books.find(book => +book.id === +id )
+//    const [added, setAdded] = useState(false)
+ 
+   function addBookToCart(book){
+    addToCart(book)
+
+   }
+
+   function bookExistsOnCart(){
+    return Cart.find(book => book.id === +id)
+   }
 
     return (
         <div id='books__body'>
@@ -28,35 +39,43 @@ const BookInfo = ({books}) => {
                         </div>
                         <div className="book__selected">
                             <figure className="book__slected--figure">
-                                <img src="https://covers.openlibrary.org/b/id/8091016-L.jpg" alt="" className="book__selected--img" />
+                                <img 
+                                src={book.url} 
+                                alt="" 
+                                className="book__selected--img" />
                             </figure>
                             <div className="book__selected--description">
                                 <h2 className="book__selected--title">
-                                    Crack the coding interview
+                                    {book.title}
                                 </h2>
-                                <Rating rating="4.5" />
+                                <Rating rating={book.rating}/>
                                 <div className="book__selected--price">
-                                    <Price originalPrice={50} salePrice={null} />
+                                    <Price originalPrice={book.originalPrice} salePrice={book.salePrice} />
 
                                 </div>
                                 <div className="book__summary">
-                                    <div className="book__summary--title">
+                                    <h3 className="book__summary--title">
                                         Summary
-                                    </div>
-                                    <p className="book__summary__para">
+                                    </h3>
+                                    <p className="book__summary--para">
                                         Lorem ipsum dolor sit amet consectetur adipisicing elit.
                                          Corporis perferendis soluta nihil cum dolores eos omnis debitis ipsam expedita nulla. 
                                          Saepe quae aliquid esse minima corrupti aut qui at ab!
                                     </p>
-                                    <p className="book__summary__para">
+                                    <p className="book__summary--para">
                                         Lorem ipsum dolor sit amet consectetur adipisicing elit.
                                          Corporis perferendis soluta nihil cum dolores eos omnis debitis ipsam expedita nulla. 
                                          Saepe quae aliquid esse minima corrupti aut qui at ab!
                                     </p>
                                 </div>
-                                <button className="btn">
+                                {bookExistsOnCart() ? ( 
+                                <button className='btn'>Checkout</button>
+                                ):(
+                                <button className="btn" onClick={() => addBookToCart}>
                                     Add to Cart
                                 </button>
+                                  )
+                                }
                             </div>
                         </div>
                     </div>
@@ -67,6 +86,15 @@ const BookInfo = ({books}) => {
                             <h2 className="book__selected--title--top">
                                 Recommended Books
                             </h2>
+                        </div>
+                        <div className="books">
+
+                        {
+                            books
+                            .filter((book) =>book.rating === 5 && +book.id !== +id)
+                            .slice(0, 4)
+                            .map(book => <Book book ={book} key={book.id} />)
+                        }
                         </div>
                     </div>
                 </div>
